@@ -1,2 +1,14 @@
 This is a work in progress.... if you need help ... read the code lolz
 
+Plugin for jumping between the cursor history locations ... this aims to be similar to the <ALT-[left|right]> ability of QTCreator.
+
+
+Mappings: 
+<ALT-j> move forward in cursor history
+<ALT-k> move backward in cursor history
+
+
+Commands: 
+CursorHistForward
+CursorHistBack
+CursorHistClear
