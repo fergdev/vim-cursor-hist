@@ -8,7 +8,6 @@ scriptencoding utf-8
 if exists('g:CursorHist_loaded') || version < 703
         finish
 endif
-
 let g:CursorHist_loaded = 1
 " }}}
 
@@ -18,61 +17,64 @@ set cpo&vim
 " }}}
 
 " Mah key mappings
-nnoremap <leader>j :call g:CursorHistForawrd()<CR>
+nnoremap <leader>j :call g:CursorHistForward()<CR>
 nnoremap <leader>k :call g:CursorHistBack()<CR>
 
 " List for cursor history
-let s:histlist = []
+let g:cursorhistlist = []
 
 " Pointer for current hisory location
-let s:currhistloc = 0
+let g:currhistloc = 0
 
 " Clears the current cursors history
-function g:CursorHistClear()
-    echo 'CursorHistClear'
-    unlet s:histlist
-    let histlist = []
+function! g:CursorHistClear()
+    echom 'CursorHistClear'
+    unlet g:cursorhistlist
+    let g:cursorhistlist = []
 
-    call s:CursorHistAdd()
-    let currhistloc = 0
-end
+    call g:CursorHistAdd()
+    let g:currhistloc = 0
+endfunction
 
 " Goes forward in history
-function g:CursorHistForward()
-    echo "CursorHistForward"
-    let histlen = len(s:histlist)
-    if s:currhistloc =~ histlen -1
-        echo 'WE ARE AT THE BEGINING OF TIME'
+function! g:CursorHistForward()
+    echom "CursorHistForward"
+    let histlen = len(g:cursorhistlist)
+    if g:currhistloc =~ histlen -1
+        echom 'WE ARE AT THE BEGINING OF TIME'
         return
     end 
-    s:currhistloc = s:currhistloc + 1
-    call s:CursorHistUpdateLoc()
+    let g:currhistloc = g:currhistloc + 1
+    call g:CursorHistUpdateLoc()
 endfunction
 
 " Goes back in history
-function g:CursorHistBack()
-    echo "CursorHistBack"
-    if s:currhistloc =~ 0
-        echo 'WE AT THE BEGINING OF TIME'
+function! g:CursorHistBack()
+    echom "CursorHistBack" . g:currhistloc . ' ' . len(g:cursorhistlist)
+
+    if g:currhistloc =~ 0
+        echom 'WE AT THE BEGINING OF TIME'
         return
     end
-    s:currhistloc = s:currhistloc - 1
-    call s:CursorHistUpdateLoc()
+    let g:currhistloc = g:currhistloc - 1
+    call g:CursorHistUpdateLoc()
 endfunction
 
 " Updates the cursor to the location that currhistloc points to
-function s:CursorHistUpdateLoc()
-    echo 'CursorHistUpdate'
-    let nextpos = s:histlist[s:currhistloc]
-    cursor(netpos)
-end
+function! g:CursorHistUpdateLoc()
+    echom 'CursorHistUpdate ' . g:currhistloc . ' ' . len(g:cursorhistlist)
+    let nextpos = g:cursorhistlist[g:currhistloc]
+    echom 'hello'.nextpos
+    call cursor(nextpos)
+endfunction
 
 " Adds to the current history
-function s:CursorHistAdd()
-    echo 'CursorHist Add' 
+function! g:CursorHistAdd()
+    echom 'CursorHist Add ' . len(g:cursorhistlist) 
     let currpos = getcurpos()
-    call add(s:histlist, currpos)
-end
+    call add(g:cursorhistlist, currpos)
+    let g:currhistloc = g:currhistloc + 1
+endfunction
 
 
 " List of posible events
@@ -83,12 +85,13 @@ end
 "
 " BufEnter
 augroup cursorhist
-    au CursorHold * s:CursorHistAdd() " Add history on cursor hold
+    au CursorHold * :call g:CursorHistAdd() " Add history on cursor hold
 
     "au CursorMoved * s:CursorHistAdd() " Add history on cursor movement
-    au BufEnter * g:CursorHistClear()  " Clear history on new buffer
+    au BufEnter * :call g:CursorHistClear()  " Clear history on new buffer
 augroup END
 
 " == Restore 'cpoptions' {{{
 
-let &cpo = s:save_cpo unlet s:save_cpo " }}}
+let &cpo = s:save_cpo 
+unlet s:save_cpo " }}}
